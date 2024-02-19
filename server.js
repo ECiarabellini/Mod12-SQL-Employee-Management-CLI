@@ -22,22 +22,74 @@ const db = mysql.createConnection(
   console.log(`Connected to the company_db database.`)
 );
 
+// View all departments
+app.get('/api/departments', (req, res) => {
+    const sql = `SELECT * FROM departments`;
+    db.query(sql, (err, rows)=> {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
+    });
+});
+
+// View all roles
+app.get('/api/roles', (req, res) => {
+    const sql = `SELECT 
+                    r.job_title, 
+                    r.id as Role_ID, 
+                    d.department_name, 
+                    r.salary
+                FROM roles r
+                JOIN departments d ON d.id=r.department_id`;
+    db.query(sql, (err, rows)=> {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
+    });
+});
+
+// View all employees
+app.get('/api/employees', (req, res) => {
+    const sql = `
+    
+    `;
+    db.query(sql, (err, rows)=> {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: rows
+        });
+    });
+});
+
+
 // Add a department
 app.post('/api/new-department', ({ body }, res) => {
-  const sql = `INSERT INTO departments (department_name)
-    VALUES (?)`;
-//   const params = [body.movie_name];
-  
-//   db.query(sql, params, (err, result) => {
-//     if (err) {
-//       res.status(400).json({ error: err.message });
-//       return;
-//     }
-//     res.json({
-//       message: 'success',
-//       data: body
-//     });
-//   });
+    const sql = `INSERT INTO departments (department_name) VALUES (?)`;
+    const params = [body.department_name];
+    db.query(sql, params, (err, result) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        res.json({
+            message: 'success',
+            data: body
+        });
+    });
 });
 
 // // Read all movies
