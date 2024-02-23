@@ -41,22 +41,3 @@ VALUES ('Rachel', 'Carlson', 14, null),
     ('William', 'Scott', 11, 12),
     ('Jessica', 'Green', 11, 16),
     ('Ryan', 'Adams', 11, 16);
-
-SELECT
-    e.ID as Employee_ID,
-    e.first_name,
-    e.last_name,
-    r.job_title,    
-    d.department_name,
-    r.salary,
-    m.first_name AS manager_first_name,
-    m.last_name AS manager_last_name
-FROM employees e
-LEFT JOIN employees m ON e.manager_id = m.id
-JOIN roles r ON r.id = e.employee_role
-JOIN departments d ON d.id = r.department_id
-
-
--- SELECT r.job_title, r.id as Role_ID, d.department_name, r.salary
--- FROM roles r
--- JOIN departments d ON d.id=r.department_id

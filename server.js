@@ -2,20 +2,18 @@
 const express = require('express');
 const mysql = require('mysql');
 
-const PORT = process.env.PORT || 3001;
+const PORT = 3001;
 const app = express();
 
 // Express middleware
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Connect to database
 const db = mysql.createConnection(
   {
     host: 'localhost',
-    // MySQL username,
     user: 'root',
-    // MySQL password
     password: 'password!1',
     database: 'company_db'
   },
@@ -24,16 +22,14 @@ const db = mysql.createConnection(
 
 // View all departments
 app.get('/api/departments', (req, res) => {
-    const sql = `SELECT * FROM departments`;
+    const sql = `SELECT id AS department_id, department_name AS department_name 
+                 FROM departments`;
     db.query(sql, (err, rows)=> {
         if (err) {
             res.status(400).json({ error: err.message });
             return;
         }
-        res.json({
-            message: 'success',
-            data: rows
-        });
+        res.json(rows);
     });
 });
 
@@ -52,10 +48,7 @@ app.get('/api/roles', (req, res) => {
             res.status(400).json({ error: err.message });
             return;
         }
-        res.json({
-            message: 'success',
-            data: rows
-        });
+        res.json(rows);
     });
 });
 
@@ -81,10 +74,7 @@ app.get('/api/employees', (req, res) => {
             res.status(400).json({ error: err.message });
             return;
         }
-        res.json({
-            message: 'success',
-            data: rows
-        });
+        res.json(rows);
     });
 });
 
@@ -93,7 +83,7 @@ app.get('/api/employees', (req, res) => {
 app.post('/api/new-department', ({ body }, res) => {
     const sql = `INSERT INTO departments (department_name) VALUES (?)`;
     const params = [body.department_name];
-    if (!department_name) {
+    if (!body.department_name) {
         res.status(400).json({ error: "Missing required fields" });
         return;
     }
@@ -103,10 +93,7 @@ app.post('/api/new-department', ({ body }, res) => {
             res.status(400).json({ error: err.message });
             return;
         }
-        res.json({
-            message: 'success',
-            data: body
-        });
+        res.json(body);
     });
 });
 
@@ -128,13 +115,10 @@ app.post('/api/new-role', ({ body }, res) => {
         }
 
         res.json({
-            message: 'success',
-            data: {
-                id: result.insertId,
-                job_title: job_title,
-                salary: salary,
-                department_id: department_id
-            }
+            id: result.insertId,
+            job_title: job_title,
+            salary: salary,
+            department_id: department_id
         });
     });
 });
@@ -158,14 +142,12 @@ app.post('/api/new-employee', ({ body }, res) => {
         }
 
         res.json({
-            message: 'success',
-            data: {
-                id: result.insertId,
-                first_name: first_name,
-                last_name: last_name,
-                employee_role: employee_role,
-                manager_id:  manager_id
-            }
+            id: result.insertId,
+            first_name: first_name,
+            last_name: last_name,
+            employee_role: employee_role,
+            manager_id:  manager_id
+            
         });
     });
 });
@@ -191,59 +173,11 @@ app.post('/api/update-employee-role', ({ body }, res) => {
         }
 
         res.json({
-            message: 'success',
-            data: {
-                id: id,
-                employee_role: employee_role,
-            }
+            id: id,
+            employee_role: employee_role
         });
     });
 });
-
-
-// // Delete a movie
-// app.delete('/api/movie/:id', (req, res) => {
-//   const sql = `DELETE FROM movies WHERE id = ?`;
-//   const params = [req.params.id];
-  
-//   db.query(sql, params, (err, result) => {
-//     if (err) {
-//       res.statusMessage(400).json({ error: res.message });
-//     } else if (!result.affectedRows) {
-//       res.json({
-//       message: 'Movie not found'
-//       });
-//     } else {
-//       res.json({
-//         message: 'deleted',
-//         changes: result.affectedRows,
-//         id: req.params.id
-//       });
-//     }
-//   });
-// });
-
-// // BONUS: Update review name
-// app.put('/api/review/:id', (req, res) => {
-//   const sql = `UPDATE reviews SET review = ? WHERE id = ?`;
-//   const params = [req.body.review, req.params.id];
-
-//   db.query(sql, params, (err, result) => {
-//     if (err) {
-//       res.status(400).json({ error: err.message });
-//     } else if (!result.affectedRows) {
-//       res.json({
-//         message: 'Movie not found'
-//       });
-//     } else {
-//       res.json({
-//         message: 'success',
-//         data: req.body,
-//         changes: result.affectedRows
-//       });
-//     }
-//   });
-// });
 
 // Default response for any other request (Not Found)
 app.use((req, res) => {
