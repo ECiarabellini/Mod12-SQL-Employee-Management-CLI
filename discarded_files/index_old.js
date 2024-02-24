@@ -1,5 +1,17 @@
 const inquirer = require('inquirer');
-let departmentNames;
+const mysql = require('mysql');
+
+// Connect to database
+const db = mysql.createConnection(
+    {
+        host: 'localhost',
+        user: 'root',
+        password: 'password!1',
+        database: 'company_db'
+    },
+    console.log(`Connected to the company_db database.`)
+);
+
 
 const getDepartments = () =>
     fetch('http://localhost:3001/api/departments', {

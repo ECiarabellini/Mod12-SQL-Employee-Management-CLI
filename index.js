@@ -228,6 +228,77 @@ const addEmployee = () => {
         });
 };
 
+const updateEmployeeRole = () => {
+    //queries are nested to ensure syncronous operation
+
+    //create a list of current employees to choose from
+    let employeeNames = [];
+    const sql = `SELECT CONCAT(first_name, ' ' ,last_name) AS name 
+                FROM employees`;
+    db.query(sql, (err, result) => {
+        if (err){ 
+            throw err; 
+        } else {
+            result.forEach((line, index) => {
+                employeeNames.push(
+                {
+                    name: line.name,
+                    value: index+1
+                }
+            )
+            });
+            
+            //create a list of current roles to choose from
+            let roleNames = [];
+            db.query(`SELECT id, job_title FROM roles`, (err, result) => {
+                if (err){ 
+                    throw err; 
+                } else {
+                    result.forEach((line, index) => {
+                        roleNames.push(
+                        {
+                            name: line.job_title,
+                            value: index+1
+                        }
+                    )
+                    });
+
+                    //ask the user for the new employee details
+                    inquirer
+                    .prompt([
+                        {
+                            type: 'list',
+                            name: 'employee',
+                            message: 'Select the employee to update: ',
+                            choices: employeeNames
+                        },              
+                        {
+                            type: 'list',
+                            name: 'role',
+                            message: 'Select the new role: ',
+                            choices: roleNames
+                        },
+                        ])
+                        .then((data) => {
+                            const sql = `UPDATE employees
+                            SET employee_role = ?
+                            WHERE id = ?;`;
+                            const params = [data.role, data.employee];
+
+                            db.query(sql, params, (err, result) => {
+                                if (err) {
+                                    throw err;
+                                }
+                                console.log('Employee updated successfully!')
+                                startMenu();
+                            });
+                        });
+                }
+            });
+        }
+    });
+};
+
 const startMenu = () => {
     inquirer
     .prompt([
