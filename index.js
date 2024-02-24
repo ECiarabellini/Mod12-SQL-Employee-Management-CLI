@@ -148,6 +148,86 @@ const addRole = () => {
         });
 };
 
+const addEmployee = () => {
+    //create a list of current roles to choose from
+    let roleNames = [];
+    db.query(`SELECT id, job_title FROM roles`, (err, result) => {
+        if (err){ 
+            throw err; 
+        } else {
+            result.forEach((line, index) => {
+                roleNames.push(
+                {
+                    name: line.job_title,
+                    value: index+1
+                }
+            )
+            });
+        }
+    });
+
+    //create a list of current employees to choose the manager from
+    let managerNames = [];
+    const sql = `SELECT id, 
+                CONCAT(first_name, ' ' ,last_name) AS FirstLastName 
+                FROM employees
+                ORDER BY ID`;
+    db.query(sql, (err, result) => {
+        if (err){ 
+            throw err; 
+        } else {
+            result.forEach((line, index) => {
+                managerNames.push(
+                {
+                    name: line.FirstLastName,
+                    value: index+1
+                }
+            )
+            });
+        }
+    });
+    
+    //ask the user for the new employee details
+    inquirer
+        .prompt([
+        {
+            type: 'input',
+            name: 'firstName',
+            message: 'Enter employee first name: '
+        },
+        {
+            type: 'input',
+            name: 'lastName',
+            message: 'Enter employee last name: '
+        },
+        {
+            type: 'list',
+            name: 'role',
+            message: 'Select the role: ',
+            choices: roleNames
+        },
+        {
+            type: 'list',
+            name: 'manager',
+            message: 'Select the manager of the employee: ',
+            choices: managerNames
+        },              
+        ])
+        .then((data) => {
+            const sql = `INSERT INTO employees (first_name, last_name, employee_role, manager_id) 
+                        VALUES (?, ?, ?, ?)`;
+            const params = [data.firstName, data.lastName, data.role, data.manager];
+
+            db.query(sql, params, (err, result) => {
+                if (err) {
+                    throw err;
+                }
+                console.log('Employee added successfully!')
+                startMenu();
+                });
+        });
+};
+
 const startMenu = () => {
     inquirer
     .prompt([
@@ -175,6 +255,12 @@ const startMenu = () => {
                 break;
             case 'add a role':
                 addRole();
+                break;
+            case 'add an employee':
+                addEmployee();
+                break;
+            case 'update an employee role':
+                updateEmployeeRole();
                 break;
         }
     });
