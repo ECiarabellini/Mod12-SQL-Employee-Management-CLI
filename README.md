@@ -13,7 +13,7 @@ Future enhancements may include:
 
 ## Installation
 - Repo: [GitHub Repo](https://github.com/ECiarabellini/Mod12-SQL-Employee-Management-CLI)
-- Video walkthrough: [GoogleDrive link](---)
+- Video walkthrough: [GoogleDrive link](https://drive.google.com/file/d/1UkAYU3CLyL3NwgKK3akyRqBU76kE29L3/view)
 
 
 ## Usage
@@ -22,7 +22,7 @@ To run:
  - Open mysql. Type source db/schema.sql, then source db/seeds.sql to create and seed the database.
  - Run 'node index' to begin application interface 
  - Arrow up and down to see all menu options and make selections. Press the Enter key to select an option. 
- - Select EXIT to quit program.
+ - Select EXIT to quit the program.
 
 
 ## Credits
