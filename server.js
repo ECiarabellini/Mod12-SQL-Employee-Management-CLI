@@ -37,7 +37,7 @@ app.get('/api/departments', (req, res) => {
 app.get('/api/roles', (req, res) => {
     const sql = `SELECT 
                     r.job_title, 
-                    r.id as Role_ID, 
+                    r.id as role_ID, 
                     d.department_name, 
                     r.salary
                 FROM roles r

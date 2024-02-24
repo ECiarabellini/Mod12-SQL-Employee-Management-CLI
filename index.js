@@ -1,149 +1,33 @@
 const inquirer = require('inquirer');
+const mysql = require('mysql');
 
-const getDepartments = () =>
-    fetch('http://localhost:3001/api/departments', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to fetch departments');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle the response data here
-        console.table(data);
-    })
-    .catch(error => {
-        console.error('Error fetching departments:', error.message);
-        console.log(error);
-    });
-
-const getRoles = () =>
-    fetch('http://localhost:3001/api/roles', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to fetch departments');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle the response data here
-        console.table(data);
-    })
-    .catch(error => {
-        console.error('Error fetching roles:', error.message);
-        console.log(error);
-    });
-
-const getEmployees = () =>
-    fetch('http://localhost:3001/api/employees', {
-        method: 'GET',
-        headers: {
-            'Content-Type': 'application/json'
-        }
-    })
-    .then(response => {
-        if (!response.ok) {
-            throw new Error('Failed to fetch employees');
-        }
-        return response.json();
-    })
-    .then(data => {
-        // Handle the response data here
-        console.table(data);
-    })
-    .catch(error => {
-        console.error('Error fetching employees:', error.message);
-        console.log(error);
-    });
-
-const addDepartment = () => 
-inquirer
-    .prompt([
+// Connect to database
+const db = mysql.createConnection(
     {
-        type: 'input',
-        name: 'addDept',
-        message: 'Enter in a department name: '
-    }
-    ])
-    .then((data) => {
-        const newDeptName = data.addDept;
-        fetch('http://localhost:3001/api/new-department', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ department_name: newDeptName })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Failed to create department');
-            }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Department created successfully:', newDeptName);
-        })
-        .catch(error => {
-            console.error('Error creating department:', error.message);
-        });
+        host: 'localhost',
+        user: 'root',
+        password: 'password!1',
+        database: 'company_db'
+    },
+    console.log(`Connected to the company_db database.`)
+);
+
+const getDepartments = () => {
+    const sql = `SELECT id AS department_id, department_name AS department_name 
+                 FROM departments`;
+    db.query(sql, (err, results)=> {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        }
+        console.table(results);
+        startMenu();
     });
+    
+}; 
 
-// const addRole = () => 
-//     inquirer
-//         .prompt([
-//         {
-//             type: 'input',
-//             name: 'title',
-//             message: 'Enter the job title: '
-//         },
-//         {
-//             type: 'input',
-//             name: 'salary',
-//             message: 'Enter the salary: '
-//         },
-//         {
-//             type: 'list',
-//             name: 'department',
-//             message: 'Select the department: ',
-//             choices: [departmentChoices]
-//         },        
-//         ])
-//         .then((data) => {
-//             const newDeptName = data.addDept;
-//             fetch('http://localhost:3001/api/new-department', {
-//                 method: 'POST',
-//                 headers: {
-//                     'Content-Type': 'application/json'
-//                 },
-//                 body: JSON.stringify({ department_name: newDeptName })
-//             })
-//             .then(response => {
-//                 if (!response.ok) {
-//                     throw new Error('Failed to create department');
-//                 }
-//                 return response.json();
-//             })
-//             .then(data => {
-//                 console.log('Department created successfully:', newDeptName);
-//             })
-//             .catch(error => {
-//                 console.error('Error creating department:', error.message);
-//             });
-//         });
-
-
-
-inquirer
+const startMenu = () => {
+    inquirer
     .prompt([
     {
         type: 'list',
@@ -159,7 +43,7 @@ inquirer
                 getDepartments();
                 break;
             case 'view all roles': 
-                getRoles();
+                displayRoles();
                 break;
             case 'view all employees':
                 getEmployees();
@@ -167,5 +51,11 @@ inquirer
             case 'add a department':
                 addDepartment();
                 break;
+            case 'add a role':
+                addRole();
+                break;
         }
     });
+}
+
+startMenu();
