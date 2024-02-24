@@ -1,5 +1,5 @@
 const inquirer = require('inquirer');
-const mysql = require('mysql');
+const mysql = require('mysql2');
 
 // Connect to mysql database
 const db = mysql.createConnection(
@@ -299,6 +299,56 @@ const updateEmployeeRole = () => {
     });
 };
 
+const viewDepartmentSpend = () => {
+    //View the total utilized budget of a department, ie the combined salaries of all employees in that department.
+    let departmentNames2 = [];
+    db.query(`SELECT *  FROM departments`, (err, result) => {
+        if (err){ 
+            throw(err); 
+        } else {
+            result.forEach((line, index) => {
+            departmentNames2.push(
+                {
+                    name: line.department_name,
+                    value: index+1
+                }
+            )
+            console.log('departmentNames2', departmentNames2);
+            });
+        
+            inquirer
+                .prompt([
+                {
+                    type: 'list',
+                    name: 'department2',
+                    message: 'Select the department: ',
+                    choices: departmentNames2
+                }           
+                ])
+                .then((data) => {
+                    const sql = `
+                    SELECT  d.department_name, SUM(r.salary) as total
+                    FROM roles r
+                    JOIN departments d ON d.id = r.department_id
+                    WHERE d.id = ?
+                    GROUP BY d.department_name
+                    `;
+                    const params = [data.department2];
+
+                    db.query(sql, params, (err, result) => {
+                        if (err) {
+                            throw err;
+                        }
+                        console.log(`Total utilized budget is: `)
+                        console.table(result)
+                        startMenu();
+                    });
+                });
+        }
+    });
+    
+};
+
 const startMenu = () => {
     inquirer
     .prompt([
@@ -307,7 +357,8 @@ const startMenu = () => {
         message: 'What would you like to do?',
         name: 'toDo',
         choices: ['view all departments', 'view all roles', 'view all employees', 
-        'add a department', 'add a role', 'add an employee',  'update an employee role'],
+        'add a department', 'add a role', 'add an employee',  'update an employee role',
+        'view total utilized budget of a department', 'EXIT'],
     },
     ])
     .then((data) => {
@@ -332,6 +383,13 @@ const startMenu = () => {
                 break;
             case 'update an employee role':
                 updateEmployeeRole();
+                break;
+            case 'view total utilized budget of a department':
+                viewDepartmentSpend();
+                break;
+            case 'EXIT':
+                console.log("Goodbye!");
+                process.exit(0);
                 break;
         }
     });
