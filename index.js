@@ -313,7 +313,6 @@ const viewDepartmentSpend = () => {
                     value: index+1
                 }
             )
-            console.log('departmentNames2', departmentNames2);
             });
         
             inquirer
